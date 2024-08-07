@@ -5,7 +5,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.dialect">
-            org.hibernate.dialect.MySQLDialect
+            org.hibernate.community.dialect.SQLiteDialect
         </property>
         <property name="hibernate.connection.driver_class">
             org.sqlite.JDBC

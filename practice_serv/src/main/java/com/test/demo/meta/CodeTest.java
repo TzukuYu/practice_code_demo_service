@@ -17,7 +17,7 @@ public class CodeTest {
 
     @Id
     @Column(name = "code_id")
-    private String codeId;
+    private int codeId;
 
     @Column(name = "code_title")
     private String codeTitle;

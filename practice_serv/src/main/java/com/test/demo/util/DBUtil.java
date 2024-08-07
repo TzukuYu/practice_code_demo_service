@@ -8,15 +8,14 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
 
 public class DBUtil {
 
@@ -31,11 +30,11 @@ public class DBUtil {
 
     }
 
-    public static void saveOne(String codeId, String codeTitle, String codeAns, String pwd) {
+    public static void saveOne(int codeId, String codeTitle, String codeAns, String pwd) {
         try (Session session = factory.openSession()) {
             Transaction tx = session.beginTransaction();
             session.persist(new CodeTest(
-                    encode(codeId, pwd),
+                    codeId,
                     encode(codeTitle, pwd),
                     encode(codeAns, pwd)
             ));
@@ -43,7 +42,7 @@ public class DBUtil {
         }
     }
 
-    public static QuestionEntity selectOne(String codeId, String pwd) {
+    public static QuestionEntity selectOne(int codeId, String pwd) {
         try (Session session = factory.openSession()) {
             String hql = "from CodeTest where codeId = :codeId";
             Query<CodeTest> query = session.createQuery(hql, CodeTest.class);
@@ -52,6 +51,21 @@ public class DBUtil {
             CodeTest ct = query.uniqueResult();
 
             return new QuestionEntity(decode(ct.getCodeTitle(), pwd), decode(ct.getCodeAns(), pwd));
+        }
+
+    }
+
+
+    public static List<CodeTest> selectAll(String pwd) {
+        try (Session session = factory.openSession()) {
+            String hql = "from CodeTest";
+            Query<CodeTest> query = session.createQuery(hql, CodeTest.class);
+
+            return query.getResultList()
+                    .stream().map(it -> {
+                        it.setCodeTitle(decode(it.getCodeTitle(), pwd));
+                        return it;
+                    }).toList();
         }
 
     }
@@ -93,4 +107,7 @@ public class DBUtil {
         }
 
     }
+
+
+
 }
